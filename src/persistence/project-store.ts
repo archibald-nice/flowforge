@@ -40,7 +40,10 @@ export class ProjectStore {
   async load(id: string): Promise<Project | null> {
     const db = await this.db;
     const result = await new Promise<{ project: Project | null; records: { path: string; value: unknown }[] }>((resolve, reject) => {
-      const tx = db.transaction(['projects', 'media'], 'readonly');
+      // 'assets' must be in scope: asset-backed media is read from its own store
+      // below, and IDB throws NotFoundError when a transaction touches a store
+      // it was not opened with.
+      const tx = db.transaction(['projects', 'media', 'assets'], 'readonly');
       const request = tx.objectStore('projects').get(id);
       let project: Project | null = null;
       const records: { path: string; value: unknown }[] = [];

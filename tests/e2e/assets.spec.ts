@@ -36,3 +36,19 @@ test('M19: wrong type, empty and oversized files are refused with a reason', asy
   await expect(page.getByTestId('notice')).toContainText('超过本地上限 5 MB');
   await expect(page.locator('.asset-list li')).toHaveCount(0);
 });
+
+test('an asset-backed project survives a reload', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByTestId('save-status')).toContainText('已保存到本地');
+  await openImageInspector(page);
+  await page.getByTestId('asset-input').setInputFiles(png('reload-study.png'));
+  await page.getByRole('button', { name: 'Use reload-study.png' }).click();
+  await expect(page.getByTestId('card-product').locator('img')).toHaveCount(1);
+  await expect(page.getByTestId('save-status')).toContainText('已保存到本地');
+  await page.reload();
+  // Reading a project whose media is asset-backed touches the reserved 'assets'
+  // object store; before the fix it was outside the read transaction and every
+  // reload threw NotFoundError instead of restoring the canvas.
+  await expect(page.getByTestId('save-status')).toContainText('已保存到本地');
+  await expect(page.getByTestId('card-product').locator('img')).toHaveCount(1);
+});
