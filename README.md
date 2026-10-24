@@ -54,6 +54,17 @@ Real providers are off by default. To enable them:
 
 **Where do keys live?** Only in the Node process (`src/server/proxy.ts`). The browser receives inlined booleans (`ARK_ENABLED`, `SPEECH_ENABLED`, …) and never sees key material. `.env.local` is git-ignored.
 
+### Self-hosting with Docker
+
+The hosted demo has no server and therefore cannot spend credits. To run your own instance with real generation:
+
+```bash
+docker build -t flowforge .
+docker run --rm -p 8787:8787 --env-file .env.local flowforge
+```
+
+One process serves the built client *and* `/api/*`, so there is no CORS and no second port. Real generation stays loopback-only unless you explicitly set `PROXY_ALLOW_REMOTE=1`. Details, the full environment table and the security posture: [docs/self-hosting.md](docs/self-hosting.md).
+
 ## Architecture
 
 ```mermaid
@@ -98,7 +109,7 @@ Edges are references rather than a pipeline; runs pin immutable input revisions;
 
 ## Roadmap
 
-- [ ] Standalone server gateway + Docker deployment (move the proxy out of the dev server)
+- [x] Standalone server gateway + Docker deployment ([docs/self-hosting.md](docs/self-hosting.md))
 - [ ] Real-time collaboration on the canvas
 - [ ] Mobile editing experience (today mobile gets a read-only summary)
 

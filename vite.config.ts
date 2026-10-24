@@ -77,7 +77,12 @@ export default defineConfig(({ mode }) => {
   // Only booleans leave the file; the keys themselves are never inlined.
   const arkEnv = loadEnv(mode, process.cwd(), 'ARK_');
   const speechEnv = loadEnv(mode, process.cwd(), 'SPEECH_');
-  const proxyOn = proxyConfigured(
+  // Self-hosted builds (Docker, `pnpm server`) serve /api from the standalone
+  // server, so the client is told a proxy exists even though no .env.local was
+  // read at build time: FORCE_PROXY_AVAILABLE=1 makes the client offer real
+  // models; the endpoints themselves stay on the server.
+  const serverMode = process.env.FORCE_PROXY_AVAILABLE === '1';
+  const proxyOn = serverMode || proxyConfigured(
     { ...arkEnv, ...speechEnv, ARK_PROXY_ENABLED: pinnedProxy ?? arkEnv.ARK_PROXY_ENABLED },
     'serve',
   );
@@ -88,8 +93,8 @@ export default defineConfig(({ mode }) => {
       'process.env.SPEECH_ENABLED': JSON.stringify(speechEnv.SPEECH_ENABLED ?? ''),
       // Slice 1.3: the client only learns whether a video endpoint exists; the
       // endpoint id and the key stay in node context.
-      'process.env.ARK_VIDEO_AVAILABLE': JSON.stringify(arkEnv.ARK_VIDEO_ENDPOINT ? '1' : ''),
-      'process.env.ARK_TEXT_AVAILABLE': JSON.stringify(arkEnv.ARK_TEXT_ENDPOINT ? '1' : ''),
+      'process.env.ARK_VIDEO_AVAILABLE': JSON.stringify(serverMode || arkEnv.ARK_VIDEO_ENDPOINT ? '1' : ''),
+      'process.env.ARK_TEXT_AVAILABLE': JSON.stringify(serverMode || arkEnv.ARK_TEXT_ENDPOINT ? '1' : ''),
       // Slice 1.6: proxy reachability is a boolean; keys and endpoints never
       // appear in the client bundle.
       'process.env.ARK_PROXY_AVAILABLE': JSON.stringify(proxyOn ? '1' : ''),

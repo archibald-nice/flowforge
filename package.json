@@ -30,7 +30,9 @@
     "test:e2e": "playwright test",
     "benchmark": "pnpm build && playwright test --config playwright.benchmark.config.ts",
     "licenses": "node scripts/license-inventory.mjs",
-    "fixtures": "node scripts/create-fixtures.mjs"
+    "fixtures": "node scripts/create-fixtures.mjs",
+    "server": "node server/index.ts",
+    "start": "node server/index.ts"
   },
   "dependencies": {
     "@xyflow/react": "^12.12.0",

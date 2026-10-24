@@ -80,7 +80,7 @@ test('1.6 server: image generation reuses the ark provider and never echoes the 
     body: { data: [{ b64_json: Buffer.from(PNG_BYTES).toString('base64'), size: '1024x1024' }], usage: { output_tokens: 77 } },
   }));
   try {
-    const reply = await withEnv({ ARK_ENABLED: '1', ARK_API_KEY: secret, ARK_PROXY_AVAILABLE: undefined }, () =>
+    const reply = await withEnv({ ARK_ENABLED: '1', ARK_API_KEY: secret, ARK_IMAGE_ENDPOINT: 'ep-test-image', ARK_PROXY_AVAILABLE: undefined }, () =>
       handleProxyRequest({
         method: 'POST',
         path: '/api/ark/generate',
@@ -108,7 +108,7 @@ test('1.6 server: one real request at a time (429 while busy)', async () => {
     return { status: 200, body: { data: [{ b64_json: Buffer.from(PNG_BYTES).toString('base64') }], usage: {} } };
   });
   try {
-    await withEnv({ ARK_ENABLED: '1', ARK_API_KEY: 'test-key-not-real' }, async () => {
+    await withEnv({ ARK_ENABLED: '1', ARK_API_KEY: 'test-key-not-real', ARK_IMAGE_ENDPOINT: 'ep-test-image' }, async () => {
       const body = JSON.stringify({ model: ARK_IMAGE_MODELS[0].id, size: DEFAULT_ARK_SETTINGS.size, prompt: 'first' });
       const first = handleProxyRequest({ method: 'POST', path: '/api/ark/generate', remoteAddress: LOOPBACK, body });
       const second = await handleProxyRequest({ method: 'POST', path: '/api/ark/generate', remoteAddress: LOOPBACK, body });

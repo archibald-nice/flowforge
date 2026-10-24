@@ -29,11 +29,11 @@ export type ArkImageModel = Readonly<{
 }>;
 
 export const ARK_IMAGE_MODELS: readonly ArkImageModel[] = Object.freeze([
-  // 2026-10-22 smoke: the account's callable entry is an endpoint id (ep-…);
-  // bare model ids returned 404 InvalidEndpointOrModel.NotFound even though
-  // /models lists them. The endpoint serves doubao-seedream-4-0-20260415.
-  // The ep id below is an account resource, not a secret; it is safe to commit.
-  Object.freeze({ id: 'ep-20261022141348-9pgqj', label: 'Seedream 4.0（方舟接入点）', sizes: ['1280x720', '1024x1024', '2K', '2304x1728'], estimate: yuanToCredits(0.2) }),
+  // The catalog entry is a placeholder: the real Ark endpoint id lives in the
+  // server environment (ARK_IMAGE_ENDPOINT) and the proxy substitutes it, so an
+  // account resource id never ships in the client bundle. Sizes and the cost
+  // estimate are UI data and stay here.
+  Object.freeze({ id: 'ark-image-endpoint', label: 'Seedream 4.0（方舟）', sizes: ['1280x720', '1024x1024', '2K', '2304x1728'], estimate: yuanToCredits(0.2) }),
 ]);
 
 export const ARK_SIZES: Readonly<Record<string, readonly string[]>> = Object.freeze(
@@ -99,12 +99,25 @@ export type ArkRun = Readonly<{
   error: string | null;
 }>;
 
+/**
+ * Sizes for a model id: either a catalog entry, or the real endpoint id that the
+ * proxy resolved from ARK_IMAGE_ENDPOINT (self-hosted builds). Anything else is
+ * rejected, so a client string never becomes an upstream model.
+ */
+const imageSizesFor = (model: string): readonly string[] | null => {
+  const known = ARK_IMAGE_MODELS.find((entry) => entry.id === model);
+  if (known) return known.sizes;
+  const endpoint = (process.env.ARK_IMAGE_ENDPOINT ?? '').trim();
+  if (endpoint && model === endpoint) return ARK_IMAGE_MODELS[0].sizes;
+  return null;
+};
+
 const realSettings = (value: unknown): { model: string; size: string; variants: 1 } => {
   const { model, size } = (value ?? {}) as { model?: unknown; size?: unknown };
-  const known = ARK_IMAGE_MODELS.find((entry) => entry.id === model);
-  if (!known) throw new Error('Unsupported Ark model.');
-  if (!known.sizes.includes(String(size))) throw new Error('Unsupported Ark size.');
-  return { model: known.id, size: String(size), variants: 1 };
+  const sizes = typeof model === 'string' ? imageSizesFor(model) : null;
+  if (!sizes) throw new Error('Unsupported Ark model.');
+  if (!sizes.includes(String(size))) throw new Error('Unsupported Ark size.');
+  return { model: String(model), size: String(size), variants: 1 };
 };
 
 export function startArkRun(request: { prompt: string; settings: { model: string; size: string; variants: 1 } }): ArkRun {

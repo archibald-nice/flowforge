@@ -14,7 +14,7 @@
  * 4. Keys are read from the environment inside this process and never appear in
  *    a response, a log line or the client bundle.
  */
-import { ARK_IMAGE_MODELS, startArkRun, tickArkRun, type ArkRun } from '../providers/ark-provider.ts';
+import { ARK_IMAGE_MODELS, ARK_SIZES, startArkRun, tickArkRun, type ArkRun } from '../providers/ark-provider.ts';
 import { ARK_VIDEO_MODELS, startVideoRun, tickVideoRun, type VideoRun } from '../providers/video-provider.ts';
 import { DEFAULT_SPEECH_SETTINGS, startSpeechRun, tickSpeechRun, type SpeechRun } from '../providers/speech-provider.ts';
 import { completeChat } from '../providers/text-provider.ts';
@@ -75,7 +75,12 @@ async function driveArk(run: ArkRun): Promise<ArkRun> {
 
 /** Two ticks: queued → running, then the single real request. */
 async function image(input: Record<string, unknown>): Promise<ProxyResponse> {
-  const settings = { model: String(input.model ?? ARK_IMAGE_MODELS[0].id), size: String(input.size ?? ARK_IMAGE_MODELS[0].sizes[0]), variants: 1 as const };
+  const model = resolveImageModel();
+  if (!model) return fail(503, '真实图片接入点未在服务端配置（ARK_IMAGE_ENDPOINT）；本次不执行。');
+  const sizes = ARK_SIZES[ARK_IMAGE_MODELS[0].id] ?? [];
+  const requestedSize = String(input.size ?? '');
+  const size = sizes.includes(requestedSize) ? requestedSize : sizes[0];
+  const settings = { model, size, variants: 1 as const };
   const prompt = String(input.prompt ?? '').trim();
   if (!prompt) return fail(400, 'Write a prompt first.');
   const run = await driveArk(startArkRun({ prompt, settings }));
@@ -145,6 +150,18 @@ export function resolveChatModel(
   const value = typeof requested === 'string' ? requested.trim() : '';
   if (endpoint && value === endpoint) return endpoint;
   return null;
+}
+
+/**
+ * Same rule for images: the client only knows the placeholder id, and the real
+ * endpoint must come from this process's environment so an account resource id
+ * never ships in the bundle.
+ */
+export function resolveImageModel(
+  env: Record<string, string | undefined> = process.env,
+): string | null {
+  const endpoint = (env.ARK_IMAGE_ENDPOINT ?? '').trim();
+  return endpoint || null;
 }
 
 async function chat(input: Record<string, unknown>): Promise<ProxyResponse> {

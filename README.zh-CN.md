@@ -54,6 +54,17 @@ pnpm dev
 
 **密钥在哪里？** 只存在于 Node 进程（`src/server/proxy.ts`）。浏览器只拿到内联的布尔开关（`ARK_ENABLED`、`SPEECH_ENABLED` 等），接触不到密钥本体。`.env.local` 已被 git 忽略。
 
+### 用 Docker 自托管
+
+线上 demo 没有服务端，所以花不了钱。要跑带真实生成的实例：
+
+```bash
+docker build -t flowforge .
+docker run --rm -p 8787:8787 --env-file .env.local flowforge
+```
+
+同一个进程既托管构建好的前端，也提供 `/api/*`，所以不需要跨域、也不用第二个端口。除非显式设置 `PROXY_ALLOW_REMOTE=1`，真实生成只接受本机调用。环境变量全表与安全说明见 [docs/self-hosting.md](docs/self-hosting.md)。
+
 ## 架构
 
 ```mermaid
@@ -98,7 +109,7 @@ CI（GitHub Actions）以并行 job 跑 typecheck、单测、e2e（装 Chromium�
 
 ## 路线图
 
-- [ ] 独立服务端网关 + Docker 部署（把代理从 dev 服务里拆出来）
+- [x] 独立服务端网关 + Docker 部署（见 [docs/self-hosting.md](docs/self-hosting.md)）
 - [ ] 画布实时协作
 - [ ] 移动端编辑体验（当前移动端只读摘要）
 
