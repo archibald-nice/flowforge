@@ -2,11 +2,12 @@
 
 An infinite-canvas AI creation workbench that is local-first and mock-first: nodes for text, image, video, audio and 3D sit on a canvas, edges express *candidate references*, and only the inputs you explicitly reference in a prompt ever enter a generation.
 
-[![CI](https://github.com/your-org/flowforge/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/flowforge/actions/workflows/ci.yml)
+[![CI](https://github.com/archibald-nice/flowforge/actions/workflows/ci.yml/badge.svg)](https://github.com/archibald-nice/flowforge/actions/workflows/ci.yml)
+[![Live demo](https://img.shields.io/badge/demo-live-aceb9e)](https://flowforge-beige-chi.vercel.app/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-24-blue.svg)](.nvmrc)
 
-<!-- TODO: replace with the deployed demo URL once hosting is set up. -->
+**[Live demo →](https://flowforge-beige-chi.vercel.app/)** — the hosted build runs in simulated mode: no keys, no provider calls, results labelled `simulated`. Everything else (canvas, references, snapshots, persistence, undo, editors) is the same code.
 
 
 <p>

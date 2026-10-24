@@ -2,11 +2,12 @@
 
 一个本地优先、mock 优先的无限画布式 AI 创作工作台：文本、图片、视频、音频、3D 节点摆在画布上，连线只表达「候选参考」，真正进入生成的只有你在 Prompt 里显式引用的内容。
 
-[![CI](https://github.com/your-org/flowforge/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/flowforge/actions/workflows/ci.yml)
+[![CI](https://github.com/archibald-nice/flowforge/actions/workflows/ci.yml/badge.svg)](https://github.com/archibald-nice/flowforge/actions/workflows/ci.yml)
+[![Live demo](https://img.shields.io/badge/demo-live-aceb9e)](https://flowforge-beige-chi.vercel.app/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-24-blue.svg)](.nvmrc)
 
-<!-- TODO: 部署完成后替换为实际 demo 地址。 -->
+**[在线 demo →](https://flowforge-beige-chi.vercel.app/)** — 线上版本跑模拟模式：不要密钥、不调用任何 provider、结果标注 `simulated`。画布、引用、快照、持久化、撤销、编辑器等其余部分与本地完全同一套代码。
 
 
 <p>
