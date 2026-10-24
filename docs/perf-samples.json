@@ -1,0 +1,152 @@
+{
+  "env": {
+    "node": "v24.11.0",
+    "pnpm": "12.3.4",
+    "nproc": 8,
+    "cpu": "Intel(R) Xeon(R) Processor",
+    "memoryTotalGb": 15,
+    "memoryAvailableGb": 3,
+    "memoryAvailableKb": 3713884,
+    "freeOutput": "total        used        free      shared  buff/cache   available\nMem:              15          12           0           0           3           3\nSwap:              0           0           0",
+    "distro": "Debian GNU/Linux 13 (trixie)",
+    "playwright": "Version 1.64.1",
+    "chromium": "156.0.8078.4",
+    "platform": "linux x64",
+    "gpu": "none (software rendering / no discrete GPU)",
+    "build": "pnpm build && pnpm preview --host 127.0.0.1 --port 5199 --strictPort",
+    "runsPerTier": 3,
+    "measuredAt": "2026-10-24T13:14:54.953Z"
+  },
+  "tiers": [
+    100,
+    300
+  ],
+  "skippedReason": "free -g available=3 GB < 4 GB，最高只测到 300 节点",
+  "samplesByTier": {
+    "100": {
+      "nodeCount": 100,
+      "coldLoadMs": [
+        311,
+        348,
+        316
+      ],
+      "dragFps": [
+        60.748120512417806,
+        60.745240388176896,
+        60.745240388176896
+      ],
+      "zoomFps": [
+        60.699086025256406,
+        60.7515187879697,
+        60.745240388176896
+      ],
+      "panFps": [
+        60.74821052070107,
+        60.73921101246341,
+        60.745240388176896
+      ],
+      "saveMs": [
+        811,
+        808,
+        804
+      ],
+      "heapBytes": [
+        17100000,
+        23100000,
+        12700000
+      ],
+      "imgCounts": [
+        40,
+        40,
+        40
+      ],
+      "failures": [],
+      "minimapOnDragFps": [],
+      "minimapOffDragFps": [],
+      "projectId": "project-d369b6d7-d9b8-42cb-aba2-6b2f78d4a233",
+      "importNotice": "整包已作为新项目导入到本地；未上传任何内容。"
+    },
+    "300": {
+      "nodeCount": 300,
+      "coldLoadMs": [
+        593,
+        626,
+        685
+      ],
+      "dragFps": [
+        60.00428602043004,
+        60.724354803730215,
+        60.72514498128365
+      ],
+      "zoomFps": [
+        121.19771863117872,
+        60.598788024239525,
+        121.25
+      ],
+      "panFps": [
+        182.1730644111906,
+        60.714285714285715,
+        179.995764805534
+      ],
+      "saveMs": [
+        858,
+        845,
+        844
+      ],
+      "heapBytes": [
+        44700000,
+        53500000,
+        47400000
+      ],
+      "imgCounts": [
+        120,
+        120,
+        120
+      ],
+      "failures": [],
+      "minimapOnDragFps": [
+        60.730852429812494,
+        60.7243548037302,
+        60.002145959102535
+      ],
+      "minimapOffDragFps": [
+        60.74124813751232,
+        60.73307010791462,
+        60.73840335568703
+      ],
+      "projectId": "project-eae644ba-0a4c-4ecf-992f-bfe99a81c445",
+      "importNotice": "整包已作为新项目导入到本地；未上传任何内容。"
+    }
+  },
+  "previousRun": {
+    "note": "Previous harness rewrote asset: → simulated: and migrated IDB; numbers below are from that run.",
+    "coldLoadMs": {
+      "100": [
+        309,
+        355,
+        358
+      ],
+      "300": [
+        672,
+        679,
+        770
+      ],
+      "500": [
+        977,
+        998,
+        1020
+      ]
+    },
+    "heapMiB": {
+      "100": 14.5,
+      "300": 23.4,
+      "500": 40.1
+    },
+    "fpsApprox": 60.7,
+    "saveMs": {
+      "100": 483,
+      "300": 504,
+      "500": 530
+    }
+  }
+}

@@ -32,7 +32,8 @@
     "licenses": "node scripts/license-inventory.mjs",
     "fixtures": "node scripts/create-fixtures.mjs",
     "server": "node server/index.ts",
-    "start": "node server/index.ts"
+    "start": "node server/index.ts",
+    "bench": "node scripts/bench.mjs"
   },
   "dependencies": {
     "@xyflow/react": "^12.12.0",
