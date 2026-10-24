@@ -27,27 +27,60 @@ function sh(cmd) {
   return execSync(cmd, { encoding: 'utf8', cwd: ROOT }).trim();
 }
 
-function captureEnv() {
-  const freeOut = sh('free -g');
-  const freeLines = freeOut.split('\n');
-  const mem = freeLines[1]?.trim().split(/\s+/) ?? [];
-  const availableGb = Number(mem[6] ?? NaN);
-  const meminfo = sh('grep -E "MemTotal|MemAvailable" /proc/meminfo');
-  const memAvailableKb = Number(
-    (meminfo.match(/MemAvailable:\s+(\d+)/) || [])[1] || 0,
-  );
-  let distro = '';
+function trySh(cmd, fallback = '') {
   try {
-    distro = sh('lsb_release -ds 2>/dev/null || true');
+    return sh(cmd);
   } catch {
-    distro = '';
+    return fallback;
   }
-  if (!distro) {
-    try {
-      distro = sh("grep PRETTY_NAME /etc/os-release | cut -d= -f2 | tr -d '\"'");
-    } catch {
-      distro = 'unknown';
+}
+
+/** Free + inactive pages from vm_stat, in GB — the macOS analogue of free -g. */
+function macAvailableGb() {
+  const out = trySh('vm_stat');
+  const pageSize = Number((out.match(/page size of (\d+) bytes/) || [])[1] || 0);
+  const pages = (label) => Number((out.match(new RegExp(label + ':\\s+(\\d+)')) || [])[1] || 0);
+  const free = pages('Pages free') + pages('Pages inactive') + pages('Pages speculative');
+  if (!pageSize || !free) return NaN;
+  return (free * pageSize) / 1024 ** 3;
+}
+
+function captureEnv() {
+  const isMac = os.platform() === 'darwin';
+  let freeOut = '';
+  let mem = [];
+  let availableGb = NaN;
+  let memAvailableKb = 0;
+  let distro = '';
+  let nproc = NaN;
+  let cpu = '';
+
+  if (isMac) {
+    const bytes = Number(trySh('sysctl -n hw.memsize', '0'));
+    availableGb = macAvailableGb();
+    memAvailableKb = Math.round((availableGb || 0) * 1024 ** 2);
+    nproc = Number(trySh('sysctl -n hw.ncpu', '0'));
+    cpu = trySh('sysctl -n machdep.cpu.brand_string', os.cpus()[0]?.model ?? 'unknown');
+    distro = trySh('sw_vers -productName && sw_vers -productVersion')
+      .split('\n')
+      .filter(Boolean)
+      .join(' ');
+    mem = ['', String(bytes / 1024 ** 3), String(availableGb)];
+  } else {
+    freeOut = sh('free -g');
+    const freeLines = freeOut.split('\n');
+    mem = freeLines[1]?.trim().split(/\s+/) ?? [];
+    availableGb = Number(mem[6] ?? NaN);
+    const meminfo = sh('grep -E "MemTotal|MemAvailable" /proc/meminfo');
+    memAvailableKb = Number(
+      (meminfo.match(/MemAvailable:\s+(\d+)/) || [])[1] || 0,
+    );
+    distro = trySh('lsb_release -ds 2>/dev/null');
+    if (!distro) {
+      distro = trySh("grep PRETTY_NAME /etc/os-release | cut -d= -f2 | tr -d '\"'", 'unknown');
     }
+    nproc = Number(trySh('nproc', String(os.cpus().length)));
+    cpu = trySh("grep -m1 'model name' /proc/cpuinfo | cut -d: -f2-").trim();
   }
   let playwrightVersion = '';
   try {
@@ -65,8 +98,8 @@ function captureEnv() {
   return {
     node: process.version,
     pnpm: sh('pnpm -v'),
-    nproc: Number(sh('nproc')),
-    cpu: sh("grep -m1 'model name' /proc/cpuinfo | cut -d: -f2-").trim(),
+    nproc,
+    cpu: cpu.trim(),
     memoryTotalGb: Number(mem[1] ?? NaN),
     memoryAvailableGb: availableGb,
     memoryAvailableKb: memAvailableKb,
@@ -75,7 +108,10 @@ function captureEnv() {
     playwright: playwrightVersion,
     chromium: chromiumVersion,
     platform: `${os.platform()} ${os.arch()}`,
-    gpu: 'none (software rendering / no discrete GPU)',
+    gpu:
+      os.platform() === 'darwin'
+        ? 'Apple GPU present; headless Chromium renders in software for this harness'
+        : 'none (software rendering / no discrete GPU)',
     build: `pnpm build && pnpm preview --host 127.0.0.1 --port ${PORT} --strictPort`,
     runsPerTier: RUNS,
     measuredAt: new Date().toISOString(),
@@ -204,21 +240,28 @@ function buildBundle(nodeCount) {
   };
 }
 
+function pidsOnPort(port) {
+  // macOS ships lsof; some Linux images ship ss but not lsof. Try both.
+  const fromLsof = trySh(`lsof -ti tcp:${port}`);
+  const fromSs = os.platform() === 'darwin' ? '' : trySh(`ss -ltnp 'sport = :${port}'`);
+  const pids = new Set();
+  for (const pid of fromLsof.split(/\s+/)) if (pid) pids.add(pid);
+  for (const match of fromSs.matchAll(/pid=(\d+)/g)) pids.add(match[1]);
+  return pids;
+}
+
 function killPort(port) {
-  try {
-    const out = sh(`ss -ltnp 'sport = :${port}' || true`);
-    const pids = new Set();
-    for (const match of out.matchAll(/pid=(\d+)/g)) pids.add(match[1]);
-    for (const pid of pids) {
-      try {
-        process.kill(Number(pid), 'SIGTERM');
-      } catch {
-        /* ignore */
-      }
+  for (const pid of pidsOnPort(port)) {
+    try {
+      process.kill(Number(pid), 'SIGTERM');
+    } catch {
+      /* ignore */
     }
-  } catch {
-    /* ignore */
   }
+}
+
+function portBusy(port) {
+  return pidsOnPort(port).size > 0;
 }
 
 async function waitForServer(url, timeoutMs = 60_000) {
@@ -620,8 +663,13 @@ function renderReport(env, tiers, samplesByTier, skippedReason) {
   lines.push('| --- | --- |');
   lines.push(`| CPU | ${env.cpu} |`);
   lines.push(`| 核数 | ${env.nproc} |`);
-  lines.push(`| 内存 total / available（\`free -g\`） | ${env.memoryTotalGb} GB / ${env.memoryAvailableGb} GB |`);
-  lines.push(`| MemAvailable（/proc/meminfo） | ${(env.memoryAvailableKb / 1024 / 1024).toFixed(2)} GB |`);
+  const isMac = String(env.platform).startsWith('darwin');
+  lines.push(
+    isMac
+      ? `| 内存 total / available（\`vm_stat\` + \`sysctl hw.memsize\`） | ${env.memoryTotalGb.toFixed(1)} GB / ${env.memoryAvailableGb.toFixed(1)} GB |`
+      : `| 内存 total / available（\`free -g\`） | ${env.memoryTotalGb} GB / ${env.memoryAvailableGb} GB |`,
+  );
+  if (!isMac) lines.push(`| MemAvailable（/proc/meminfo） | ${(env.memoryAvailableKb / 1024 / 1024).toFixed(2)} GB |`);
   lines.push(`| 发行版 | ${env.distro} |`);
   lines.push(`| Node | ${env.node} |`);
   lines.push(`| pnpm | ${env.pnpm} |`);
@@ -720,7 +768,7 @@ function renderReport(env, tiers, samplesByTier, skippedReason) {
   lines.push('## 6. 局限性');
   lines.push('');
   lines.push('- **无 GPU**：Chromium 走软件渲染，绝对帧率明显低于有独显的机器；结论以相对伸缩性为主。');
-  lines.push('- **VM / 共享宿主**：`free -g` available 可能波动；本机 available < 4 GB 时按规则降档。');
+  lines.push('- **VM / 共享宿主**：内存可用量可能波动；本机 available < 4 GB 时按规则降档。');
   lines.push('- **Headless**：无真实显示器合成；FPS 以 rAF 回调/秒换算，不是 presented-frame。Headless 常不锁 vsync，绝对值可能高于 60，只可作相对比较。');
   lines.push('- **缩放路径**：产品关闭了 `zoomOnScroll`，本脚本用 Ctrl+滚轮（React Flow 激活键）做 20 次缩放。');
   lines.push('- **绝对值不可跨机比较**。');
@@ -766,7 +814,7 @@ async function main() {
 
   console.log('Node', env.node, 'pnpm', env.pnpm);
   console.log('CPU', env.cpu, 'nproc', env.nproc);
-  console.log('Mem available Gb (free -g):', env.memoryAvailableGb);
+  console.log('Mem available GB:', env.memoryAvailableGb);
   if (!env.node.startsWith('v24.') && !env.node.startsWith('v25.')) {
     // engines say >=24.11 <25; still allow if somehow newer, but warn under 24.11
   }
@@ -778,7 +826,7 @@ async function main() {
 
   const skippedReason =
     env.memoryAvailableGb < 4
-      ? `free -g available=${env.memoryAvailableGb} GB < 4 GB，最高只测到 300 节点`
+      ? `available=${env.memoryAvailableGb} GB < 4 GB，最高只测到 300 节点`
       : null;
   const tiers = skippedReason ? [100, 300] : [100, 300, 500];
 
@@ -811,13 +859,7 @@ async function main() {
     }
     killPort(PORT);
     await sleep(300);
-    let still = '';
-    try {
-      still = sh(`ss -ltnp 'sport = :${PORT}' || true`);
-    } catch {
-      still = '';
-    }
-    return !/pid=/.test(still);
+    return !portBusy(PORT);
   };
 
   try {
