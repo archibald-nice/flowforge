@@ -91,6 +91,10 @@ pnpm build        # 类型检查 + 生产构建
 
 CI（GitHub Actions）以并行 job 跑 typecheck、单测、e2e（装 Chromium）与构建；e2e 失败会上传 trace。新功能应随附测试——项目不变量与 PR 清单见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
+## 为什么这样设计
+
+连线只表示参考而非执行管线；每次运行都会冻结不可变的输入版本；模拟结果与真实结果从不混淆；provider 密钥始终留在 Node 进程。每条决策的理由和代价写在 [docs/design-notes.md](docs/design-notes.md)。
+
 ## 路线图
 
 - [ ] 独立服务端网关 + Docker 部署（把代理从 dev 服务里拆出来）

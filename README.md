@@ -91,6 +91,10 @@ pnpm build        # typecheck + production build
 
 CI (GitHub Actions) runs typecheck, unit, e2e (with Chromium) and build as parallel jobs; e2e failures upload their traces. New features are expected to come with tests — see [CONTRIBUTING.md](CONTRIBUTING.md) for the project invariants and PR checklist.
 
+## Why it is built this way
+
+Edges are references rather than a pipeline; runs pin immutable input revisions; simulated and real results never blur together; provider keys stay in the Node process. The reasoning, and the cost of each choice, is written down in [docs/design-notes.md](docs/design-notes.md).
+
 ## Roadmap
 
 - [ ] Standalone server gateway + Docker deployment (move the proxy out of the dev server)
