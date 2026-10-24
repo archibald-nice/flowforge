@@ -1,0 +1,40 @@
+name: Feature request
+description: Suggest an idea or an improvement for FlowForge.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Feature ideas are welcome. Please check existing issues first so we
+        don't fragment the discussion.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or motivation
+      description: What are you trying to achieve, and what gets in the way today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What would you like to happen? Sketches and references help.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Project invariants
+      description: Proposals must be compatible with the project invariants (CONTRIBUTING.md).
+      options:
+        - label: This feature would not make edges trigger provider calls
+        - label: This feature keeps simulated results labelled `simulated`
+        - label: This feature keeps provider keys on the Node side
+    validations:
+      required: true

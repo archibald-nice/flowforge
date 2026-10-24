@@ -1,0 +1,62 @@
+/* 6.4 — Agent 面板 / 计划卡 / 引用行 的视觉层（只动样式） */
+
+/* ---------- 输入条：胶囊化 + 焦点态 ---------- */
+.composer{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-pill);padding:9px 12px;gap:4px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.composer:focus-within{border-color:var(--line-strong);box-shadow:0 8px 28px rgba(0,0,0,.6)}
+.composer-row input{font-size:13px;color:var(--text);padding:7px 10px}
+.composer-row input::placeholder{color:var(--text-muted)}
+.composer-row .linkish{font-size:11px;color:var(--text-muted);text-decoration:none;padding:6px 10px;border-radius:var(--radius-pill)}
+.composer-row .linkish:hover{background:var(--surface-hover);color:var(--text)}
+.composer-row .linkish[aria-pressed='true']{background:var(--surface-hover);color:var(--text)}
+
+/* ---------- 计划卡：结构化执行计划 ---------- */
+.plan-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:14px 16px;gap:10px;box-shadow:var(--shadow-lg)}
+.plan-card header{align-items:center;padding-bottom:10px;border-bottom:1px solid var(--line-soft)}
+.plan-card header .eyebrow{font-size:11px;color:var(--text-muted);letter-spacing:.04em}
+.plan-card header strong{font-size:14px;color:var(--text)}
+.plan-card ol{gap:2px}
+.plan-card ol li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px;padding:8px 0;border-bottom:1px solid var(--line-soft)}
+.plan-card ol li:last-child{border-bottom:0}
+.plan-card ol li strong{font-size:12px;color:var(--text)}
+.plan-card ol li p{margin:2px 0 0;font-size:11px;color:var(--text-muted);line-height:1.55}
+.plan-card ol li::before{content:attr(data-step);display:grid;place-items:center;width:20px;height:20px;border-radius:999px;background:var(--surface-3);border:1px solid var(--line);font-size:10px;color:var(--text-soft)}
+.plan-card [data-testid='plan-source']{font-size:11px;color:var(--text-muted);padding:2px 0}
+.plan-card footer{align-items:center;padding-top:10px;border-top:1px solid var(--line-soft);font-size:11px;color:var(--text-soft)}
+.plan-card footer .primary{width:auto;margin:0;padding:7px 16px}
+.plan-card footer .linkish{text-decoration:none;padding:6px 10px;border-radius:var(--radius-pill)}
+.plan-card footer .linkish:hover{background:var(--surface-hover)}
+
+/* ---------- 引用行：来源卡片 ---------- */
+.reference-list{gap:6px}
+.reference-chip{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"kind title remove" "meta meta meta";gap:6px 10px;padding:9px 11px;background:var(--surface-2);border:1px solid var(--line-soft);border-radius:var(--radius-md)}
+.reference-chip:hover{border-color:var(--line-strong)}
+.chip-kind{grid-area:kind;font-size:10px;letter-spacing:.03em;color:var(--text-soft);background:var(--surface-3);border:1px solid var(--line-soft);border-radius:6px;padding:2px 7px;text-transform:none}
+.chip-title{grid-area:title;font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip-remove{grid-area:remove;width:22px;height:22px;border-radius:999px;border:1px solid transparent;background:transparent;color:var(--text-muted)}
+.chip-remove:hover{background:var(--surface-hover);border-color:var(--line);color:var(--text)}
+.chip-meta{grid-area:meta;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.chip-meta small{font-size:10px;color:var(--text-muted)}
+.chip-meta select{font-size:11px;padding:3px 6px;background:var(--surface-3);border:1px solid var(--line-soft);border-radius:8px;color:var(--text-soft)}
+
+/* ---------- 候选行 ---------- */
+.reference-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px;border:1px solid var(--line-soft);border-radius:var(--radius-sm);background:var(--surface-2);margin-bottom:4px}
+.reference-row label{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-soft);min-width:0}
+.reference-row small{font-size:10px;color:var(--text-muted)}
+.reference-row .linkish{text-decoration:none;font-size:11px;color:var(--text-muted);white-space:nowrap}
+.reference-row .linkish:hover{color:var(--text)}
+
+/* ---------- 建议列表 ---------- */
+.advice-list{gap:4px;margin:6px 0 0}
+.advice-list li{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px;background:var(--surface-2);border:1px solid var(--line-soft);border-radius:var(--radius-sm);font-size:12px;color:var(--text-soft)}
+.advice-list li .linkish{display:inline-block;text-decoration:none;font-size:11px;padding:3px 9px;border:1px solid var(--line);border-radius:var(--radius-pill);color:var(--text-soft)}
+.advice-list li .linkish:hover{background:var(--surface-hover);color:var(--text)}
+
+/* ---------- 运行面板 ---------- */
+.run-panel{padding:10px 12px;background:var(--surface-2);border:1px solid var(--line-soft);border-radius:var(--radius-md);margin-top:8px}
+.run-panel .eyebrow{font-size:10px;color:var(--text-muted);letter-spacing:.04em}
+.run-panel p{margin:4px 0;font-size:12px;color:var(--text-soft)}
+.run-panel output{color:var(--text)}
+.run-panel .linkish{text-decoration:none;font-size:11px;padding:4px 10px;border:1px solid var(--line);border-radius:var(--radius-pill);margin-top:4px}
+.run-panel .linkish:hover{background:var(--surface-hover)}
+.plan-card{bottom:118px;max-height:58vh;overflow:auto;animation:none}
+.composer-log{max-height:130px;overflow:auto}

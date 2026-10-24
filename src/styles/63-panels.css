@@ -1,0 +1,83 @@
+/* 6.3 — 素材库 / 编辑器 / 时间线 的视觉层（只动样式，不动行为） */
+
+/* ---------- 素材库：左侧抽屉 + 双列缩略图 ---------- */
+.library-panel{left:74px;top:16px;width:360px;padding:14px 14px 18px;border-radius:var(--radius-lg);background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow-lg);animation:panel-in .18s var(--ease)}
+.library-panel header{margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--line-soft)}
+.library-panel header .eyebrow{font-size:13px;font-weight:500;letter-spacing:0;color:var(--text)}
+.library-panel header .linkish{font-size:12px}
+.library-tabs{display:flex;gap:4px;padding:3px;background:var(--surface-3);border:1px solid var(--line-soft);border-radius:var(--radius-pill);margin-bottom:8px}
+.library-tabs [role=tab]{flex:1;padding:5px 10px;font-size:12px;border:0;background:transparent;border-radius:var(--radius-pill);color:var(--text-muted)}
+.library-tabs [role=tab][aria-selected=true]{background:var(--surface-hover);color:var(--text)}
+.library-panel input{width:100%;margin:0 0 8px;padding:8px 12px;font-size:12px;background:var(--surface-3);border:1px solid var(--line-soft);border-radius:var(--radius-pill);color:var(--text)}
+.library-panel input::placeholder{color:var(--text-muted)}
+.library-categories{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.library-categories button{padding:4px 10px;font-size:11px;border:1px solid var(--line-soft);border-radius:var(--radius-pill);background:transparent;color:var(--text-soft)}
+.library-categories button[aria-pressed=true]{background:var(--warm);border-color:var(--warm);color:#141410}
+.library-rows{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0;margin:0;list-style:none}
+.library-rows li{display:grid;grid-template-columns:1fr;grid-template-areas:"thumb" "name" "meta" "acts";gap:6px;padding:8px;background:var(--surface-2);border:1px solid var(--line-soft);border-radius:var(--radius-md);position:relative}
+.library-rows li:hover{border-color:var(--line-strong)}
+.library-rows li img{grid-area:thumb;width:100%;height:96px;object-fit:cover;border-radius:calc(var(--radius-md) - 4px);background:var(--surface-3)}
+.library-rows li > span{grid-area:name;font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.library-rows li > span small{display:block;font-size:10px;color:var(--text-muted)}
+.library-rows li .linkish{grid-area:auto;font-size:11px;text-decoration:none;padding:3px 0}
+.library-rows li select{grid-area:auto;font-size:10px;padding:2px 4px;background:var(--surface-3);border:1px solid var(--line-soft);border-radius:6px;color:var(--text-soft)}
+.library-panel .empty-record{font-size:12px;line-height:1.6;color:var(--text-muted);padding:18px 4px;text-align:center;border:1px dashed var(--line);border-radius:var(--radius-md)}
+
+/* ---------- 图片编辑器：全屏画布编辑器外观 ---------- */
+.editor-shell{background:var(--bg);padding:0;gap:0}
+.editor-shell header{height:56px;padding:0 16px;border-bottom:1px solid var(--line);background:var(--surface);gap:12px}
+.editor-shell header .eyebrow{font-size:13px;color:var(--text);letter-spacing:0}
+.editor-tools{display:flex;flex-direction:column;gap:6px;padding:10px 6px;margin:0;border:1px solid var(--line);border-radius:var(--radius-pill);background:var(--surface);position:absolute;left:16px;top:50%;transform:translateY(-50%)}
+.editor-tools button{width:36px;height:36px;border-radius:999px;border:0;background:transparent;color:var(--text-soft)}
+.editor-tools button[aria-pressed=true]{background:var(--surface-hover);color:var(--text)}
+.editor-canvas{margin:56px 0 92px;display:grid;place-items:center;background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1px);background-size:22px 22px}
+.editor-variants{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding:16px}
+.editor-prompt{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);width:min(680px,calc(100% - 240px));display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-pill);box-shadow:var(--shadow-md);z-index:2}
+.editor-prompt input{flex:1;min-width:0;background:transparent;border:0;color:var(--text);font-size:12px}
+.editor-prompt .primary{width:auto;margin:0;flex:0 0 auto;padding:7px 16px}
+
+/* ---------- 时间线：底部胶片式面板 ---------- */
+.timeline-panel{left:74px;right:74px;bottom:14px;width:auto;max-height:46%;padding:14px 16px}
+.timeline-panel li{gap:10px;padding:8px 0}
+.timeline-clip{display:grid;gap:6px}
+.timeline-strip{height:34px;border-radius:8px;background:repeating-linear-gradient(90deg,var(--surface-3) 0 10px,var(--surface-2) 10px 20px);border:1px solid var(--line-soft);position:relative;overflow:hidden}
+.timeline-strip::after{content:"";position:absolute;inset:4px;border-left:2px solid var(--accent);border-right:2px solid var(--accent);opacity:.55}
+.timeline-panel input[type=number]{width:64px;padding:4px 6px;background:var(--surface-3);border:1px solid var(--line-soft);border-radius:8px;color:var(--text)}
+.timeline-panel footer{border-top:1px solid var(--line-soft);padding-top:10px}
+
+/* 面板出现动效 */
+@keyframes panel-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.editor-prompt{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);width:min(720px,calc(100% - 240px));display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-pill);box-shadow:var(--shadow-md);z-index:2}
+.editor-prompt input{flex:1 1 auto;min-width:0;background:transparent;border:0;color:var(--text);font-size:13px}
+.editor-prompt .editor-model{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-muted)}
+.editor-prompt .editor-model select{font-size:11px;background:var(--surface-3);border:1px solid var(--line-soft);border-radius:8px;color:var(--text-soft);padding:4px 6px;max-width:190px}
+.editor-prompt .cost-badge{white-space:nowrap;font-size:11px}
+.editor-prompt .primary{width:auto;margin:0;flex:0 0 auto}
+.editor-thumbs{display:flex;gap:8px;justify-content:center;margin:16px 0 0;padding:0;list-style:none}
+.editor-thumbs button{padding:6px 14px;font-size:12px;border-radius:var(--radius-pill);border:1px solid var(--line);background:var(--surface-2);color:var(--text-soft)}
+.editor-thumbs button[aria-pressed=true]{border-color:var(--accent);color:var(--text)}
+.timeline-strip{grid-column:1/-1}
+.editor-variant{display:grid;place-items:center;gap:4px;width:min(520px,60vw);aspect-ratio:1;border:1px solid var(--line);border-radius:var(--radius-lg);background:repeating-conic-gradient(var(--surface-2) 0% 25%,var(--surface-3) 0% 50%) 50%/32px 32px;font-size:13px;color:var(--text-soft)}
+.editor-variant small{font-size:11px;color:var(--text-muted)}
+.editor-shell header > div{display:flex;align-items:center;gap:10px}
+.editor-shell header .linkish{font-size:12px;text-decoration:none;padding:6px 12px;border:1px solid var(--line);border-radius:var(--radius-pill);color:var(--text-soft)}
+.editor-shell header .linkish:hover{background:var(--surface-hover);color:var(--text)}
+.editor-shell header .linkish:disabled{opacity:.45}
+.editor-base{margin:0;display:grid;justify-items:center;gap:10px;padding:24px}
+.editor-base img{max-width:min(560px,50vw);max-height:52vh;border-radius:var(--radius-lg);border:1px solid var(--line);background:var(--surface)}
+.editor-base figcaption{font-size:12px;color:var(--text-muted)}
+.timeline-panel{bottom:76px;max-height:40%}
+.timeline-panel footer{display:flex;gap:10px;align-items:center}
+.timeline-panel footer .primary{width:auto;margin:0;flex:0 0 auto}
+.template-panel{bottom:76px}
+.template-panel .linkish{font-size:12px}
+.timeline-panel{position:fixed;left:74px;right:340px;bottom:76px;z-index:36;background:var(--surface)}
+.template-panel{position:fixed;left:74px;right:340px;bottom:76px;z-index:36;background:var(--surface);width:auto}
+.timeline-panel{z-index:45;background:var(--surface-2)}
+.template-panel{z-index:45;background:var(--surface-2)}
+.timeline-panel,.template-panel,.library-panel{animation:arrive .16s ease-out both}
+@keyframes arrive{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.timeline-panel{opacity:1}
+.timeline-panel,.template-panel,.library-panel,.plan-card,.wallet-panel{animation:none!important;opacity:1}
+.editor-note{font-size:11px;color:var(--text-muted);margin:10px 0 0}

@@ -1,0 +1,34 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # Patch and minor npm updates land as one PR so a weekly cycle costs a
+      # single CI run instead of one per package.
+      npm-patch-minor:
+        applies-to: version-updates
+        update-types:
+          - patch
+          - minor
+      # react and react-dom must move together: mixing 19.3.x with 19.3.y hangs
+      # the app in the browser and times out every e2e test.
+      react:
+        applies-to: version-updates
+        patterns:
+          - react
+          - react-dom
+          - '@types/react'
+          - '@types/react-dom'
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # All GitHub Actions bumps in one PR: they only touch ci.yml and are
+      # verified by the same CI run anyway.
+      github-actions:
+        applies-to: version-updates
+        patterns:
+          - '*'

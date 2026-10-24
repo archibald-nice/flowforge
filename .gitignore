@@ -1,0 +1,26 @@
+# Research captures stay local; ignore is not encryption or a sync policy.
+.private-research/
+*.har
+
+# Internal working notes and local research; not part of the public repo.
+docs/research/
+docs/fast-study/
+AGENTS.md
+.env.local
+
+# Local credentials and configuration.
+.env
+.env.*
+!.env.example
+
+# Local development and test artifacts (M1 dependencies installed).
+node_modules/
+.pnpm-store/
+dist/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+.DS_Store
+.tmp/
+docs/open-research/

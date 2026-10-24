@@ -1,0 +1,18 @@
+/* 6.5 — hover toolbar: a dark capsule that floats above the hovered node.
+   Uses the shared tokens only; no new dependencies. */
+.node-card{position:relative}
+/* The toolbar floats above the card, so the card itself must not clip it. */
+.node-card{overflow:visible}
+.node-card header,.node-card p{overflow:hidden}
+.node-card img{border-radius:var(--radius-md)}
+.hover-toolbar{position:absolute;left:50%;top:-44px;transform:translateX(-50%);display:flex;align-items:center;gap:2px;
+  background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px;box-shadow:var(--shadow-sm);z-index:30;
+  visibility:hidden;pointer-events:none;opacity:0;transition:opacity .12s var(--ease)}
+.hover-toolbar button{display:grid;place-items:center;width:30px;height:30px;border:0;background:transparent;color:var(--text-soft);
+  border-radius:var(--radius-sm);cursor:pointer}
+.hover-toolbar button:hover{background:var(--surface-hover);color:var(--text)}
+.hover-toolbar svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.hover-toolbar .danger:hover{background:rgba(220,90,80,.18);color:#e58f83}
+.node-card:hover .hover-toolbar{opacity:1;visibility:visible;pointer-events:auto}
+/* While a node is dragged the cursor is a grab, not hover intent: collapse. */
+.react-flow__node.dragging .hover-toolbar{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
